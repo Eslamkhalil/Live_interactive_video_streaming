@@ -4,10 +4,9 @@ import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
 
 const appId = "50b4f9c09089446891d912d2b2ed672b";
-const token = "007eJxTYDD9s3HP5cSsreu3/V91+80x3dwJzL/2tiUJ5iakCqVeWftYgcHUIMkkzTLZwNLAwtLExMzC0jDF0tAoxSjJKDXFzNwo6ejF/vSGQEYG3+5gZkYGCATxWRhKUotLGBgAOMMiGA==";
+const token =
+    "007eJxTYDD9s3HP5cSsreu3/V91+80x3dwJzL/2tiUJ5iakCqVeWftYgcHUIMkkzTLZwNLAwtLExMzC0jDF0tAoxSjJKDXFzNwo6ejF/vSGQEYG3+5gZkYGCATxWRhKUotLGBgAOMMiGA==";
 const channel = "test";
-
-
 
 class MyApp2 extends StatefulWidget {
   const MyApp2({super.key});
@@ -17,13 +16,20 @@ class MyApp2 extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp2> {
+  final TextEditingController _commentController = TextEditingController();
+  final List<String> _comments = [];
   late RtcEngine _engine;
   bool _isBroadcaster = false;
-  bool _isMuted = false;
   bool _isCameraOff = false;
+  bool _isMuted = false;
   int _likesCount = 0;
-  List<String> _comments = [];
-  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _engine.leaveChannel();
+    _engine.release();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -33,7 +39,7 @@ class _MyAppState extends State<MyApp2> {
 
   Future<void> initAgora() async {
     await [Permission.microphone, Permission.camera].request();
-    
+
     _engine = createAgoraRtcEngine();
     await _engine.initialize(const RtcEngineContext(
       appId: appId,
@@ -48,7 +54,8 @@ class _MyAppState extends State<MyApp2> {
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           debugPrint("Remote user joined: $remoteUid");
         },
-        onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
+        onUserOffline: (RtcConnection connection, int remoteUid,
+            UserOfflineReasonType reason) {
           debugPrint("Remote user left: $remoteUid");
         },
       ),
@@ -64,8 +71,8 @@ class _MyAppState extends State<MyApp2> {
     });
 
     await _engine.setClientRole(
-      role: _isBroadcaster 
-          ? ClientRoleType.clientRoleBroadcaster 
+      role: _isBroadcaster
+          ? ClientRoleType.clientRoleBroadcaster
           : ClientRoleType.clientRoleAudience,
     );
 
@@ -102,10 +109,11 @@ class _MyAppState extends State<MyApp2> {
                     icon: const Icon(Icons.favorite, color: Colors.red),
                     onPressed: () => setState(() => _likesCount++),
                   ),
-                  Text('$_likesCount', style: const TextStyle(color: Colors.white)),
+                  Text('$_likesCount',
+                      style: const TextStyle(color: Colors.white)),
                 ],
               ),
-              
+
               // Comment Input
               SizedBox(
                 width: 200,
@@ -129,7 +137,7 @@ class _MyAppState extends State<MyApp2> {
                   ),
                 ),
               ),
-              
+
               // Gift Button
               IconButton(
                 icon: const Icon(Icons.card_giftcard, color: Colors.yellow),
@@ -137,7 +145,7 @@ class _MyAppState extends State<MyApp2> {
               ),
             ],
           ),
-          
+
           // Comments Display
           SizedBox(
             height: 100,
@@ -223,7 +231,8 @@ class _MyAppState extends State<MyApp2> {
                 child: Column(
                   children: [
                     IconButton(
-                      icon: Icon(_isCameraOff ? Icons.videocam_off : Icons.videocam),
+                      icon: Icon(
+                          _isCameraOff ? Icons.videocam_off : Icons.videocam),
                       color: Colors.white,
                       onPressed: () async {
                         await _engine.muteLocalVideoStream(!_isCameraOff);
@@ -248,12 +257,5 @@ class _MyAppState extends State<MyApp2> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _engine.leaveChannel();
-    _engine.release();
-    super.dispose();
   }
 }

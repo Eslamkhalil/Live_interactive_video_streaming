@@ -9,6 +9,8 @@
 
 <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices. -->
 <uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+<uses-permission android:name="android.permission.USE_FINGERPRINT"/>
 <!-- For Android 12 and above devices, the following permission is also required. -->
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <application
